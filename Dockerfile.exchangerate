@@ -9,11 +9,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copiar el resto de archivos
 COPY api/ /app/
 
-# Añadir cron job para actualizar las tasas de cambio a la 1 AM
-RUN apt-get update && apt-get -y install cron
-COPY api/crontab /etc/cron.d/exchange_rate_cron
-RUN chmod 0644 /etc/cron.d/exchange_rate_cron
-RUN crontab /etc/cron.d/exchange_rate_cron
-
-# Ejecutar cron y la aplicación Flask
-CMD service cron start && gunicorn --bind 0.0.0.0:5000 app:app
+# CMD para iniciar la aplicación Flask con gunicorn
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]

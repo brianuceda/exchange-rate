@@ -1,42 +1,36 @@
+# app.py
+
 from flask import Flask, jsonify
-import redis
-import os
-import requests
-from bs4 import BeautifulSoup
-import datetime
-import pytz
-from dotenv import load_dotenv
 
-load_dotenv()
+from utils import get_peru_datetime, peru_timezone
+from cronjob import initialize_scheduler
+from service import exchange_rate_service, scheduled_task_update_exchange_rate
 
-# Configuración de zona horaria para Perú
-peru_timezone = pytz.timezone('America/Lima')
-
+# Initialize Flask app
 app = Flask(__name__)
 
-# Configuración de Redis
-redis_client = redis.Redis(
-    host=os.environ.get('EXCHANGERATE_REDIS_HOST'),
-    port=int(os.environ.get('EXCHANGERATE_REDIS_PORT')),
-    password=os.environ.get('EXCHANGERATE_REDIS_PASSWORD'),
-    db=int(os.environ.get('EXCHANGERATE_REDIS_DB')),
-    decode_responses=True
-)
-
-@app.route('/today')
-def exchange_rate_controller():
+# Routes
+@app.route('/api/v1/today', methods=['GET'])
+def get_today_exchange_rate():
     try:
-        redis_client.ping()
-        return jsonify(message="Redis connected successfully - " + str(get_peru_datetime())), 200
+        today = get_peru_datetime().strftime('%Y-%m-%d')
+        result = exchange_rate_service(today)
+        if result:
+            return jsonify(result), 200
+        else:
+            return jsonify({"error": "No se pudo obtener la tasa de cambio"}), 500
     except Exception as e:
-        return jsonify(message=str(e)), 500
-
-def exchange_rate_service():
-    return jsonify(message="Exchange rate service")
-
-# Función de utilidad para obtener la fecha y hora actual en zona horaria de Perú
-def get_peru_datetime():
-    return datetime.datetime.now(peru_timezone)
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Initialize scheduler before starting the app
+    scheduler = initialize_scheduler(
+        function_to_execute=scheduled_task_update_exchange_rate,
+        task_id='scheduled_task_update_exchange_rate',
+        time_zone=peru_timezone(),
+        execution_hour=12,
+        execution_minute=40
+    )
+    
+    # Start Flask app
+    app.run()
