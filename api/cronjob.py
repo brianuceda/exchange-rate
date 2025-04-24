@@ -1,13 +1,14 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 
+from utils import peru_timezone
+
 def initialize_scheduler(
     function_to_execute,
     task_id='scheduled_task',
-    time_zone='America/Lima',
     execution_hour=1,
     execution_minute=0
 ):
-    scheduler = BackgroundScheduler(timezone=time_zone)
+    scheduler = BackgroundScheduler(timezone=peru_timezone())
     
     print(f"Tarea '{task_id}' programada a la(s) {execution_hour}:{execution_minute}")
     

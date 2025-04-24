@@ -2,7 +2,7 @@
 
 from flask import Flask, jsonify
 
-from utils import get_peru_datetime, peru_timezone
+from utils import get_peru_datetime
 from cronjob import initialize_scheduler
 from service import exchange_rate_service, scheduled_task_update_exchange_rate
 
@@ -24,9 +24,8 @@ if __name__ == '__main__':
     scheduler = initialize_scheduler(
         function_to_execute=scheduled_task_update_exchange_rate,
         task_id='scheduled_task_update_exchange_rate',
-        time_zone=peru_timezone(),
         execution_hour=12,
-        execution_minute=45
+        execution_minute=49
     )
     
     app.run()
