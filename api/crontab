@@ -1,0 +1,1 @@
+0 1 * * * cd /app && python /app/update_rates.py >> /app/cron.log 2>&1
