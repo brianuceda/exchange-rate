@@ -8,6 +8,13 @@ from service import exchange_rate_service, scheduled_task_update_exchange_rate
 
 app = Flask(__name__)
 
+scheduler = initialize_scheduler(
+    function_to_execute=scheduled_task_update_exchange_rate,
+    task_id='scheduled_task_update_exchange_rate',
+    execution_hour=12,
+    execution_minute=56
+)
+
 @app.route('/api/v1/today', methods=['GET'])
 def get_today_exchange_rate():
     try:
@@ -20,12 +27,5 @@ def get_today_exchange_rate():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-if __name__ == '__main__':
-    scheduler = initialize_scheduler(
-        function_to_execute=scheduled_task_update_exchange_rate,
-        task_id='scheduled_task_update_exchange_rate',
-        execution_hour=12,
-        execution_minute=49
-    )
-    
+if __name__ == '__main__':    
     app.run()
