@@ -2,12 +2,24 @@
 
 from flask import Flask, jsonify
 
-from utils import get_peru_datetime
-from cronjob import initialize_scheduler
-from service import exchange_rate_service, scheduled_task_update_exchange_rate
+from security import configure_cors
 
+from service import exchange_rate_service, scheduled_task_update_exchange_rate
+from cronjob import initialize_scheduler
+
+from utils import get_peru_datetime
+
+# Application
 app = Flask(__name__)
 
+# CORS
+app = configure_cors(app,
+    origins=[
+        'https://brianuceda.vercel.app'
+    ]
+)
+
+# Cronjob
 scheduler = initialize_scheduler(
     function_to_execute=scheduled_task_update_exchange_rate,
     id='scheduled_task_update_exchange_rate',
