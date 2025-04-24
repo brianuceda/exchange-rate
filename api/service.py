@@ -3,7 +3,7 @@ import time
 import redis
 from dotenv import load_dotenv
 
-from utils import get_logger, get_peru_datetime
+from utils import get_peru_datetime
 
 load_dotenv()
 
@@ -44,14 +44,14 @@ def exchange_rate_service(date_key=None):
 # Cronjob function (simulation of controller)
 def scheduled_task_update_exchange_rate():
     try:
-        get_logger().info(f"Ejecutando tarea programada: {get_peru_datetime()}")
+        print(f"Ejecutando tarea programada: {get_peru_datetime()}")
         
         today = get_peru_datetime().strftime('%Y-%m-%d')
         result = exchange_rate_service(today)
         
         if result:
-            get_logger().info(f"Actualización exitosa.")
+            print(f"Actualización exitosa.")
         else:
-            get_logger().error("Actualización fallida.")
+            print("Actualización fallida.")
     except Exception as e:
-        get_logger().error(f"Error en la actualización programada: {str(e)}")
+        print(f"Error en la actualización programada: {str(e)}")

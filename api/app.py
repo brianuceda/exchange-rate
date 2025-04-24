@@ -6,10 +6,8 @@ from utils import get_peru_datetime, peru_timezone
 from cronjob import initialize_scheduler
 from service import exchange_rate_service, scheduled_task_update_exchange_rate
 
-# Initialize Flask app
 app = Flask(__name__)
 
-# Routes
 @app.route('/api/v1/today', methods=['GET'])
 def get_today_exchange_rate():
     try:
@@ -23,14 +21,12 @@ def get_today_exchange_rate():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    # Initialize scheduler before starting the app
     scheduler = initialize_scheduler(
         function_to_execute=scheduled_task_update_exchange_rate,
         task_id='scheduled_task_update_exchange_rate',
         time_zone=peru_timezone(),
         execution_hour=12,
-        execution_minute=40
+        execution_minute=45
     )
     
-    # Start Flask app
     app.run()
