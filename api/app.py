@@ -11,8 +11,8 @@ app = Flask(__name__)
 scheduler = initialize_scheduler(
     function_to_execute=scheduled_task_update_exchange_rate,
     task_id='scheduled_task_update_exchange_rate',
-    execution_hour=12,
-    execution_minute=56
+    execution_hour=13,
+    execution_minute=01
 )
 
 @app.route('/api/v1/today', methods=['GET'])
