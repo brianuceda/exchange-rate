@@ -14,7 +14,8 @@ app = Flask(__name__)
 # CORS
 app = configure_cors(app,
     origins=[
-        'https://brianuceda.vercel.app'
+        'https://brianuceda.vercel.app',
+        'https://brianuceda-v3.vercel.app'
     ]
 )
 
