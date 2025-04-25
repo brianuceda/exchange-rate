@@ -1,16 +1,12 @@
 # app.py
 
-from bs4 import BeautifulSoup
 from flask import Flask, jsonify, make_response, redirect, url_for
-import requests
 import json
 
 from security import configure_cors
 
 from service import exchange_rate_service, scheduled_task_update_exchange_rate
 from cronjob import initialize_scheduler
-
-from utils import get_peru_datetime
 
 # Application
 app = Flask(__name__)
@@ -30,14 +26,6 @@ scheduler = initialize_scheduler(
     minute=1
 )
 
-# Constantes
-CURRENCY_SYMBOLS = {
-    "PEN": "S/",
-    "USD": "$",
-    "CAD": "$",
-    "EUR": "€",
-}
-
 @app.route('/api/v1/<currency_code>', methods=['GET'])
 def get_currency_exchange_rate(currency_code):
     return redirect(url_for('convert_currency_amount', currency_code=currency_code, amount=1))
@@ -45,11 +33,7 @@ def get_currency_exchange_rate(currency_code):
 @app.route('/api/v1/<currency_code>/<amount>', methods=['GET'])
 def convert_currency_amount(currency_code, amount):
     try:
-        date = get_peru_datetime().strftime('%Y-%m-%d')
-        
-        currency_code = currency_code.upper()
-        amount = float(amount)
-        result = exchange_rate_service(date, currency_code, amount)
+        result = exchange_rate_service(currency_code, amount)
         
         if result and "error" not in result:
             response_json = json.dumps(result, indent=2)
