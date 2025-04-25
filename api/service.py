@@ -15,16 +15,15 @@ redis_client = redis.Redis(
     decode_responses=True
 )
 
-def get_exchange_rate_from_web(date_str=None):
-    now = get_peru_datetime()
+def get_exchange_rate_from_web(date=None):
     time.sleep(5)
     return {
         "message": "Ok",
-        "date": date_str or now.strftime('%Y-%m-%d'),
+        "date": date,
     }
 
-def exchange_rate_service(date_key=None):
-    redis_key = f'exchange_rate:{date_key}'
+def exchange_rate_service(date=None):
+    redis_key = f'exchange_rate:{date}'
     
     # Try to get from Redis
     cached_data = redis_client.get(redis_key)
@@ -33,7 +32,7 @@ def exchange_rate_service(date_key=None):
         return data
     
     # If not in cache, get from web
-    exchange_data = get_exchange_rate_from_web(date_key)
+    exchange_data = get_exchange_rate_from_web(date)
     if exchange_data:
         expiration_time = 24 * 60 * 60 + 5 * 60  # 1 day and 5 minutes
         redis_client.setex(redis_key, expiration_time, str(exchange_data))
