@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta, timezone
 import os
 import time
 import redis
@@ -26,7 +27,7 @@ def get_exchange_rate_from_web(currency_code="PEN"):
             return {"error": f"Currency code '{currency_code}' not supported"}
         
         # Fetch exchange rate data
-        url = f"https://api.exchangerate-api.com/v4/latest/{currency_code}"
+        url = f"https://open.er-api.com/v6/latest/{currency_code}"
         response = requests.get(url, timeout=30)
         response.raise_for_status()
         
@@ -37,7 +38,8 @@ def get_exchange_rate_from_web(currency_code="PEN"):
             
             for code in CURRENCY_SYMBOLS:
                 if code != currency_code and code in data['rates']:
-                    converted_value = round(data['rates'][code], 2)
+                    # Preserve 6 decimal places maximum
+                    converted_value = round(data['rates'][code], 6)
                     conversions[code] = {
                         "value": converted_value,
                         "symbol": CURRENCY_SYMBOLS[code],
@@ -47,8 +49,8 @@ def get_exchange_rate_from_web(currency_code="PEN"):
             return {
                 "base": currency_code,
                 "amount": 1,
-                "date": data['date'],
-                "time_last_updated": data['time_last_updated'],
+                "time_last_update_peru": datetime.fromtimestamp(data['time_last_update_unix'], timezone(timedelta(hours=-5))).strftime('%Y-%m-%dT%H:%M'),
+                "time_next_update_peru": datetime.fromtimestamp(data['time_next_update_unix'], timezone(timedelta(hours=-5))).strftime('%Y-%m-%dT%H:%M'),
                 "conversions": conversions
             }
         else:
@@ -69,7 +71,8 @@ def apply_amount_to_conversions(exchange_data, amount):
     # Apply the amount to each conversion
     for code, conversion in result["conversions"].items():
         original_value = conversion["value"]
-        new_value = round(original_value * amount, 2)
+        # Calculate with 6 decimal places maximum
+        new_value = round(original_value * amount, 6)
         result["conversions"][code]["value"] = new_value
         result["conversions"][code]["formatted"] = f"{conversion['symbol']} {new_value}"
     
