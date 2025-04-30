@@ -10,6 +10,7 @@ from cronjob import initialize_scheduler
 
 # Application
 app = Flask(__name__)
+app.config['TIMEOUT'] = 30
 
 # CORS
 app = configure_cors(app,

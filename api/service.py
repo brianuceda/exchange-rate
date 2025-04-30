@@ -16,7 +16,9 @@ redis_client = redis.Redis(
     port=int(os.environ.get('EXCHANGERATE_REDIS_PORT')),
     password=os.environ.get('EXCHANGERATE_REDIS_PASSWORD'),
     db=int(os.environ.get('EXCHANGERATE_REDIS_DB')),
-    decode_responses=True
+    decode_responses=True,
+    socket_timeout=5,
+    socket_connect_timeout=5
 )
 
 def get_exchange_rate_from_web(currency_code="PEN"):
@@ -28,7 +30,7 @@ def get_exchange_rate_from_web(currency_code="PEN"):
         
         # Fetch exchange rate data
         url = f"https://open.er-api.com/v6/latest/{currency_code}"
-        response = requests.get(url, timeout=30)
+        response = requests.get(url, timeout=10)
         response.raise_for_status()
         
         data = response.json()
