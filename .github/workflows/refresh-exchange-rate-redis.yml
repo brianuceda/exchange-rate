@@ -1,0 +1,23 @@
+name: Refresh Exchange Rate Redis
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+jobs:
+  call-api-endpoints:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Call PEN endpoint
+        run: curl --silent --show-error --fail https://exchangerate.brianuceda.xyz/api/v1/PEN || true
+
+      - name: Call USD endpoint
+        run: curl --silent --show-error --fail https://exchangerate.brianuceda.xyz/api/v1/USD || true
+
+      - name: Call CAD endpoint
+        run: curl --silent --show-error --fail https://exchangerate.brianuceda.xyz/api/v1/CAD || true
+
+      - name: Call EUR endpoint
+        run: curl --silent --show-error --fail https://exchangerate.brianuceda.xyz/api/v1/EUR || true
