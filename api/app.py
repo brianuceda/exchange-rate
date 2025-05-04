@@ -4,27 +4,16 @@ from flask import Flask, jsonify, make_response, redirect, url_for
 import json
 
 from security import configure_cors
-
-from service import exchange_rate_service, scheduled_task_update_exchange_rate
-from cronjob import initialize_scheduler
+from service import exchange_rate_service
 
 # Application
 app = Flask(__name__)
-app.config['TIMEOUT'] = 30
 
 # CORS
 app = configure_cors(app,
     origins=[
         'https://brianuceda.vercel.app'
     ]
-)
-
-# Cronjob
-scheduler = initialize_scheduler(
-    function_to_execute=scheduled_task_update_exchange_rate,
-    id='scheduled_task_update_exchange_rate',
-    hour=0,
-    minute=1
 )
 
 @app.route('/api/v1/<currency_code>', methods=['GET'])

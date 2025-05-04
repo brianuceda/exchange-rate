@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta, timezone
 import os
-import time
 import redis
 import requests
 from dotenv import load_dotenv
@@ -109,23 +108,3 @@ def exchange_rate_service(currency_code="PEN", amount=1):
         return apply_amount_to_conversions(exchange_data, amount)
     
     return exchange_data
-
-# Cronjob function (simulation of controller)
-def scheduled_task_update_exchange_rate():
-    try:
-        print(f"Ejecutando tarea programada: {get_peru_datetime()}")
-        
-        result = exchange_rate_service("PEN", 1)
-        time.sleep(1)
-        result = exchange_rate_service("USD", 1)
-        time.sleep(1)
-        result = exchange_rate_service("CAD", 1)
-        time.sleep(1)
-        result = exchange_rate_service("EUR", 1)
-        
-        if result:
-            print(f"Actualización exitosa.")
-        else:
-            print("Actualización fallida.")
-    except Exception as e:
-        print(f"Error en la actualización programada: {str(e)}")
